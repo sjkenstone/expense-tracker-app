@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Expense Tracker Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chart-gradient {
+            background: linear-gradient(180deg, rgba(17, 82, 212, 0.2) 0%, rgba(17, 82, 212, 0) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-auto min-h-screen w-full max-w-md mx-auto flex-col bg-white dark:bg-background-dark shadow-2xl overflow-x-hidden pb-20">
+<!-- Header Section -->
+<div class="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+<div class="flex size-10 shrink-0 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/20" data-alt="User profile picture showing a friendly face" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA8zXKwuKuh6jZGsN9RHokD1yr9hLZ3OgPbhEOOWgYQNmYEBLDVZd1wPMq3nB5lHiax3kMmzmo7H4I2HZ1nY5afPEXGJtYv0xagFtJ3qJKRohWXXdCqWCUJMbDUdi5HWS8FSonBomocr1GMiKQ7HoTpMAG4HBiLGL0xajvCpl0UVz7bZYk7wr7JS9QnIBRH_93tnYokiiXN0fZ4nPbqKC_kqrwykS5pXUd3glb81nQR3EBt4JwpjoX4LNo_JDrb9_mFmAtiqyYDr_w");'></div>
+</div>
+<div class="flex-1 ml-3">
+<p class="text-slate-500 text-xs font-medium">Good morning,</p>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">Alex Rivera</h2>
+</div>
+<div class="flex w-10 items-center justify-end">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+<!-- Total Balance Hero Card -->
+<div class="p-4">
+<div class="flex flex-col items-stretch justify-start rounded-xl shadow-lg bg-primary text-white p-6 relative overflow-hidden">
+<!-- Abstract Pattern Overlay -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+<div class="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full -ml-12 -mb-12 blur-xl"></div>
+<div class="relative z-10">
+<p class="text-white/80 text-sm font-medium mb-1">Total Balance</p>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-bold tracking-tight">$4,250.00</span>
+<span class="text-white/90 text-sm ml-2 bg-white/20 px-2 py-0.5 rounded-full">+2.5%</span>
+</div>
+<div class="mt-8 flex justify-between items-end">
+<div>
+<p class="text-white/70 text-xs uppercase tracking-wider font-semibold">Account Number</p>
+<p class="text-sm font-mono tracking-widest">**** 8842</p>
+</div>
+<button class="bg-white text-primary px-4 py-2 rounded-lg text-sm font-bold shadow-sm active:scale-95 transition-transform">
+                            View Assets
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Income/Expense Quick Stats -->
+<div class="flex gap-4 px-4 py-2">
+<div class="flex flex-1 flex-col gap-1 rounded-xl p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800/30">
+<div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400">
+<span class="material-symbols-outlined text-sm">arrow_downward</span>
+<p class="text-xs font-bold uppercase">Income</p>
+</div>
+<p class="text-slate-900 dark:text-white text-xl font-bold">$5,800</p>
+</div>
+<div class="flex flex-1 flex-col gap-1 rounded-xl p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/30">
+<div class="flex items-center gap-2 text-rose-600 dark:text-rose-400">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+<p class="text-xs font-bold uppercase">Expense</p>
+</div>
+<p class="text-slate-900 dark:text-white text-xl font-bold">$1,550</p>
+</div>
+</div>
+<!-- Spending Trend Chart -->
+<div class="px-4 py-4">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Spending Trend</h3>
+<select class="bg-transparent text-xs font-bold text-primary border-none focus:ring-0 cursor-pointer">
+<option>Last 7 Days</option>
+<option>This Month</option>
+</select>
+</div>
+<div class="w-full h-40 relative flex items-end justify-between gap-1 pt-4">
+<!-- Visual Chart Representation -->
+<div class="chart-gradient absolute inset-x-0 bottom-0 top-8 rounded-t-lg"></div>
+<div class="w-full h-[1px] bg-primary absolute top-12 opacity-50"></div>
+<!-- Chart Bars for visual data -->
+<div class="w-full h-full flex items-end justify-around px-2 gap-2 relative z-10">
+<div class="w-3 bg-primary rounded-t-full" style="height: 40%"></div>
+<div class="w-3 bg-primary rounded-t-full" style="height: 65%"></div>
+<div class="w-3 bg-primary rounded-t-full" style="height: 35%"></div>
+<div class="w-3 bg-primary rounded-t-full" style="height: 85%"></div>
+<div class="w-3 bg-primary rounded-t-full" style="height: 50%"></div>
+<div class="w-3 bg-primary rounded-t-full" style="height: 70%"></div>
+<div class="w-3 bg-primary/40 rounded-t-full" style="height: 30%"></div>
+</div>
+</div>
+<div class="flex justify-between mt-2 px-1 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- Categories Section -->
+<div class="px-4 py-4">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Categories</h3>
+<button class="text-primary text-xs font-bold">See All</button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Category Item -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-3 mb-3">
+<div class="size-8 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">shopping_cart</span>
+</div>
+<span class="text-sm font-bold">Groceries</span>
+</div>
+<p class="text-lg font-bold mb-1">$450.00</p>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-orange-500 h-full w-[65%]"></div>
+</div>
+</div>
+<!-- Category Item -->
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-3 mb-3">
+<div class="size-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">home</span>
+</div>
+<span class="text-sm font-bold">Rent</span>
+</div>
+<p class="text-lg font-bold mb-1">$1,200.00</p>
+<div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-blue-500 h-full w-[95%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity -->
+<div class="px-4 py-4">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Recent Activity</h3>
+<button class="text-primary text-xs font-bold">View More</button>
+</div>
+<div class="space-y-3">
+<!-- Transaction 1 -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-background-dark border border-slate-50 dark:border-slate-800 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined">coffee</span>
+</div>
+<div>
+<p class="text-sm font-bold">Starbucks Coffee</p>
+<p class="text-xs text-slate-400">Today, 09:41 AM</p>
+</div>
+</div>
+<p class="text-rose-600 font-bold">-$5.50</p>
+</div>
+<!-- Transaction 2 -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-background-dark border border-slate-50 dark:border-slate-800 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined">local_gas_station</span>
+</div>
+<div>
+<p class="text-sm font-bold">Shell Gas Station</p>
+<p class="text-xs text-slate-400">Yesterday, 06:15 PM</p>
+</div>
+</div>
+<p class="text-rose-600 font-bold">-$45.00</p>
+</div>
+<!-- Transaction 3 -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-background-dark border border-slate-50 dark:border-slate-800 shadow-sm">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="text-sm font-bold">Salary Credit</p>
+<p class="text-xs text-slate-400">Jan 28, 2024</p>
+</div>
+</div>
+<p class="text-emerald-600 font-bold">+$2,900.00</p>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-white dark:bg-background-dark border-t border-slate-100 dark:border-slate-800 px-6 py-3 flex items-center justify-between z-50">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">home</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">History</span>
+</a>
+<div class="relative -top-8">
+<button class="bg-primary text-white size-14 rounded-full shadow-lg shadow-primary/40 flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Stats</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Profile</span>
+</a>
+</div>
+</div>
+</body></html>
