@@ -56,7 +56,7 @@ const ReportsStats = () => {
     <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
       
       <header className="sticky top-0 z-10 flex items-center bg-white dark:bg-background-dark/80 backdrop-blur-md p-4 border-b border-gray-100 dark:border-gray-800 justify-between">
-        <Link to="/" className="flex size-10 shrink-0 items-center justify-start text-primary">
+        <Link to="/dashboard" className="flex size-10 shrink-0 items-center justify-start text-primary">
           <span className="material-symbols-outlined cursor-pointer">arrow_back</span>
         </Link>
         <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight flex-1 text-center">Statistics</h2>

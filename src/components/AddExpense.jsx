@@ -11,6 +11,7 @@ const AddExpense = () => {
   const [category, setCategory] = useState('Food');
   const [merchant, setMerchant] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [time, setTime] = useState(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
   const [note, setNote] = useState('');
 
   const expenseCategories = [
@@ -37,14 +38,14 @@ const AddExpense = () => {
     addTransaction({
       title: merchant,
       amount: parseFloat(amount),
-      date: new Date(date),
+      date: new Date(`${date}T${time}`),
       type: type,
       category: category,
       icon: selectedCategory ? selectedCategory.icon : (type === 'expense' ? 'receipt' : 'add_circle'),
       note: note
     });
 
-    navigate('/');
+    navigate('/dashboard');
   };
 
   const handleTypeChange = (newType) => {
@@ -58,7 +59,7 @@ const AddExpense = () => {
       <div className="relative flex h-screen w-full max-w-md mx-auto flex-col bg-white dark:bg-background-dark shadow-xl overflow-hidden">
 
         <div className="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between border-b border-gray-100 dark:border-gray-800">
-          <Link to="/" className="text-[#111318] dark:text-white flex size-10 shrink-0 items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
+          <Link to="/dashboard" className="text-[#111318] dark:text-white flex size-10 shrink-0 items-center justify-center cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full">
             <span className="material-symbols-outlined">close</span>
           </Link>
           <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
@@ -144,16 +145,31 @@ const AddExpense = () => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 px-1">Date</label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">calendar_today</span>
-                <input 
-                  className={`w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-[#111318] dark:text-white focus:ring-1 transition-all outline-none ${type === 'expense' ? 'focus:border-primary focus:ring-primary' : 'focus:border-emerald-500 focus:ring-emerald-500'}`} 
-                  type="date" 
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 px-1">Date</label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl pointer-events-none">calendar_today</span>
+                  <input 
+                    className={`w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-[#111318] dark:text-white focus:ring-1 transition-all outline-none ${type === 'expense' ? 'focus:border-primary focus:ring-primary' : 'focus:border-emerald-500 focus:ring-emerald-500'}`} 
+                    type="date" 
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 px-1">Time</label>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl pointer-events-none">schedule</span>
+                  <input 
+                    className={`w-full pl-10 pr-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 text-[#111318] dark:text-white focus:ring-1 transition-all outline-none ${type === 'expense' ? 'focus:border-primary focus:ring-primary' : 'focus:border-emerald-500 focus:ring-emerald-500'}`} 
+                    type="time" 
+                    value={time}
+                    onChange={(e) => setTime(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 

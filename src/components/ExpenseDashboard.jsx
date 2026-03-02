@@ -21,11 +21,11 @@ const ExpenseDashboard = () => {
     yesterday.setDate(yesterday.getDate() - 1);
 
     if (d.toDateString() === today.toDateString()) {
-      return `Today, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `Today, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`;
     } else if (d.toDateString() === yesterday.toDateString()) {
-      return `Yesterday, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `Yesterday, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`;
     } else {
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return `${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}`;
     }
   };
 

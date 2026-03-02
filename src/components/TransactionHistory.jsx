@@ -42,7 +42,7 @@ const TransactionHistory = () => {
   };
 
   const formatTime = (date) => {
-    return new Date(date).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    return new Date(date).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
   };
 
   return (
@@ -51,7 +51,7 @@ const TransactionHistory = () => {
       <div className="relative flex h-screen w-full flex-col max-w-md mx-auto bg-white dark:bg-background-dark shadow-xl overflow-hidden pb-24">
 
         <header className="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-primary/10">
-          <Link to="/" className="text-[#111318] dark:text-white flex size-10 shrink-0 items-center justify-center cursor-pointer">
+          <Link to="/dashboard" className="text-[#111318] dark:text-white flex size-10 shrink-0 items-center justify-center cursor-pointer">
             <span className="material-symbols-outlined">arrow_back</span>
           </Link>
           <h2 className="text-[#111318] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Transactions</h2>

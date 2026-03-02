@@ -4,7 +4,7 @@ import { useExpense } from '../context/ExpenseContext';
 
 const UserProfileSettings = () => {
   const navigate = useNavigate();
-  const { user, updateUser } = useExpense();
+  const { user, updateUser, logout } = useExpense();
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(user.name);
 
@@ -24,9 +24,13 @@ const UserProfileSettings = () => {
     }
   };
 
-  const handleLogout = () => {
-    // Perform any logout logic here if needed
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed:', err.message);
+    }
   };
 
   return (
@@ -35,7 +39,7 @@ const UserProfileSettings = () => {
 <div className="relative flex min-h-screen w-full max-w-md mx-auto flex-col bg-white dark:bg-background-dark shadow-xl overflow-x-hidden">
 
 <div className="sticky top-0 z-10 flex items-center bg-white/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between border-b border-slate-100 dark:border-slate-800">
-<Link to="/" className="text-slate-900 dark:text-white flex size-10 shrink-0 items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors">
+<Link to="/dashboard" className="text-slate-900 dark:text-white flex size-10 shrink-0 items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors">
 <span className="material-symbols-outlined">arrow_back</span>
 </Link>
 <h2 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 text-center">Profile</h2>

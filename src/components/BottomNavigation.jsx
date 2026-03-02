@@ -9,7 +9,7 @@ const BottomNavigation = () => {
     <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-background-dark border-t border-slate-100 dark:border-slate-800 z-50 pb-safe">
       <div className="max-w-md mx-auto px-6 h-[70px] flex items-center justify-between relative">
         {/* Home */}
-        <NavLink to="/" className={getLinkClass} end>
+        <NavLink to="/dashboard" className={getLinkClass} end>
           {({ isActive }) => (
             <>
               <span className="material-symbols-outlined" style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}>home</span>

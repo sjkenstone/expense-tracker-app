@@ -1,37 +1,93 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const Register = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     if (!email || !password || !confirmPassword) {
       setError('Please fill in all fields');
+      setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      setLoading(false);
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
+      setLoading(false);
       return;
     }
 
-    // Mock registration success
-    console.log('Registering with:', { email, password });
-    alert('Registration successful!');
-    navigate('/');
+    try {
+      // 1. Supabase Auth Sign Up
+      const { data, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) throw authError;
+
+      if (data.user) {
+        // 2. 同步到 profiles 表
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            { 
+              id: data.user.id, 
+              email: data.user.email,
+              created_at: new Date().toISOString()
+            }
+          ]);
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+          // 虽然 profile 创建失败，但 Auth 已经成功了，这里可以根据需求处理
+        }
+
+        setSuccess(true);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to register');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white dark:bg-background-dark rounded-3xl shadow-2xl p-8 text-center border border-slate-100 dark:border-slate-800">
+          <div className="size-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="material-symbols-outlined text-5xl">mark_email_read</span>
+          </div>
+          <h2 className="text-2xl font-extrabold mb-4">Check your email</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-8">
+            We've sent a verification link to <span className="font-bold text-slate-900 dark:text-white">{email}</span>. 
+            Please verify your email to complete registration.
+          </p>
+          <Link to="/" className="inline-block bg-primary text-white font-bold py-4 px-8 rounded-xl shadow-lg shadow-primary/25 transition-all active:scale-95">
+            Back to Login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display flex items-center justify-center p-4">
@@ -62,6 +118,7 @@ const Register = () => {
                   placeholder="Enter your email" 
                   type="email" 
                   value={email}
+                  disabled={loading}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
@@ -76,6 +133,7 @@ const Register = () => {
                   placeholder="Create a password" 
                   type="password" 
                   value={password}
+                  disabled={loading}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
@@ -90,6 +148,7 @@ const Register = () => {
                   placeholder="Repeat your password" 
                   type="password" 
                   value={confirmPassword}
+                  disabled={loading}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                 />
               </div>
@@ -97,17 +156,18 @@ const Register = () => {
 
             <button 
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-4"
+              disabled={loading}
+              className={`w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-4 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              <span className="material-symbols-outlined">how_to_reg</span>
-              Sign Up
+              <span className="material-symbols-outlined">{loading ? 'sync' : 'how_to_reg'}</span>
+              {loading ? 'Processing...' : 'Sign Up'}
             </button>
           </form>
 
           <div className="mt-8 text-center">
             <p className="text-slate-500 dark:text-slate-400 text-sm">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary font-bold hover:underline">
+              <Link to="/" className="text-primary font-bold hover:underline">
                 Sign In
               </Link>
             </p>

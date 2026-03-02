@@ -1,24 +1,50 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     if (!email || !password) {
       setError('Please fill in all fields');
+      setLoading(false);
       return;
     }
 
-    // Mock login success
-    console.log('Logging in with:', { email, password });
-    navigate('/');
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        if (authError.message.includes('Email not confirmed')) {
+          setError('Please confirm your email address before logging in.');
+        } else if (authError.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please try again.');
+        } else {
+          throw authError;
+        }
+        return;
+      }
+
+      if (data.user) {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to sign in');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,7 +55,7 @@ const Login = () => {
             <div className="size-16 bg-primary rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary/20">
               <span className="material-symbols-outlined text-white text-4xl">login</span>
             </div>
-            <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Welcome Back</h1>
+            <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white">Expense</h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 text-center">Login to your account to continue</p>
           </div>
 
@@ -50,6 +76,7 @@ const Login = () => {
                   placeholder="Enter your email" 
                   type="email" 
                   value={email}
+                  disabled={loading}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
@@ -67,6 +94,7 @@ const Login = () => {
                   placeholder="Enter your password" 
                   type="password" 
                   value={password}
+                  disabled={loading}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
@@ -74,10 +102,11 @@ const Login = () => {
 
             <button 
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-4"
+              disabled={loading}
+              className={`w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-4 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              <span className="material-symbols-outlined">login</span>
-              Sign In
+              <span className="material-symbols-outlined">{loading ? 'sync' : 'login'}</span>
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
