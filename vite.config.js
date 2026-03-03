@@ -14,6 +14,10 @@ export default defineConfig({
         short_name: 'Stitch',
         description: 'Track your daily expenses and income with ease.',
         theme_color: '#3b82f6',
+        background_color: '#ffffff',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/',
         icons: [
           {
             src: 'pwa-192x192.png',

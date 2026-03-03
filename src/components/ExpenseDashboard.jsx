@@ -105,12 +105,12 @@ const ExpenseDashboard = () => {
               <p className="text-white/80 text-sm font-medium mb-1">Total Balance</p>
               <div className="flex items-baseline gap-1">
                 <span className="text-3xl font-bold tracking-tight">{formatCurrency(balance)}</span>
-                <span className="text-white/90 text-sm ml-2 bg-white/20 px-2 py-0.5 rounded-full">+2.5%</span>
+                {/* <span className="text-white/90 text-sm ml-2 bg-white/20 px-2 py-0.5 rounded-full">+2.5%</span> */}
               </div>
               <div className="mt-8 flex justify-between items-end">
                 <div>
-                  <p className="text-white/70 text-xs uppercase tracking-wider font-semibold">Account Number</p>
-                  <p className="text-sm font-mono tracking-widest">**** 8842</p>
+                  {/* <p className="text-white/70 text-xs uppercase tracking-wider font-semibold">Account Number</p>
+                  <p className="text-sm font-mono tracking-widest">**** 8842</p> */}
                 </div>
                 <button className="bg-white text-primary px-4 py-2 rounded-lg text-sm font-bold shadow-sm active:scale-95 transition-transform">
                   View Assets
