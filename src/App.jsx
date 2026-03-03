@@ -9,6 +9,7 @@ import ReportsStats from './components/ReportsStats';
 import UserProfileSettings from './components/UserProfileSettings';
 import Register from './components/Register';
 import Login from './components/Login';
+import EditTransaction from './components/EditTransaction';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // 辅助组件：处理重定向
@@ -43,6 +44,7 @@ function App() {
               <Route path="/profile" element={<UserProfileSettings />} />
             </Route>
             <Route path="/add-expense" element={<AddExpense />} />
+            <Route path="/edit-transaction/:id" element={<EditTransaction />} />
           </Route>
 
           {/* 兜底路由：404 或未匹配路径重定向 */}

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useExpense } from '../context/ExpenseContext';
 
 const TransactionHistory = () => {
+  const navigate = useNavigate();
   const { transactions } = useExpense();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
@@ -96,7 +97,11 @@ const TransactionHistory = () => {
               <h3 className="text-[#111318] dark:text-white/70 text-sm font-bold uppercase tracking-wider mb-3">{formatDateHeader(dateStr)}</h3>
               <div className="space-y-3">
                 {groupedTransactions[dateStr].map(transaction => (
-                  <div key={transaction.id} className="flex items-center justify-between p-3 rounded-xl bg-background-light/50 dark:bg-white/5 border border-primary/5">
+                  <div 
+                    key={transaction.id} 
+                    onClick={() => navigate(`/edit-transaction/${transaction.id}`)}
+                    className="flex items-center justify-between p-3 rounded-xl bg-background-light/50 dark:bg-white/5 border border-primary/5 hover:border-primary/20 cursor-pointer transition-colors active:scale-[0.98]"
+                  >
                     <div className="flex items-center gap-4">
                       <div className={`flex size-12 items-center justify-center rounded-xl ${transaction.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-orange-100 text-orange-600'}`}>
                         <span className="material-symbols-outlined">{transaction.icon}</span>

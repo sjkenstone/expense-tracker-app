@@ -81,6 +81,10 @@ export const ExpenseProvider = ({ children }) => {
     setTransactions(prev => [{ ...transaction, id: Date.now().toString() }, ...prev]);
   };
 
+  const updateTransaction = (id, updatedData) => {
+    setTransactions(prev => prev.map(t => t.id === id ? { ...t, ...updatedData } : t));
+  };
+
   const deleteTransaction = (id) => {
     setTransactions(prev => prev.filter(t => t.id !== id));
   };
@@ -130,6 +134,7 @@ export const ExpenseProvider = ({ children }) => {
       transactions,
       user,
       addTransaction,
+      updateTransaction,
       deleteTransaction,
       updateUser,
       logout,
