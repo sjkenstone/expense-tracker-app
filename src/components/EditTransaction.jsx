@@ -5,62 +5,62 @@ import { useExpense } from '../context/ExpenseContext';
 const EditTransaction = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { transactions, updateTransaction, deleteTransaction } = useExpense();
+  const { transactions, updateTransaction, deleteTransaction, accounts, categories: allCategories, addAccount } = useExpense();
   
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense');
-  const [category, setCategory] = useState('Food');
+  const [categoryId, setCategoryId] = useState('');
+  const [accountId, setAccountId] = useState('');
   const [merchant, setMerchant] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [note, setNote] = useState('');
+  const [isAddingAccount, setIsAddingAccount] = useState(false);
+  const [newAccountName, setNewAccountName] = useState('');
 
-  const expenseCategories = [
-    { name: 'Food', icon: 'restaurant', color: 'bg-primary' },
-    { name: 'Transport', icon: 'directions_car', color: 'bg-orange-500' },
-    { name: 'Shopping', icon: 'shopping_bag', color: 'bg-purple-500' },
-    { name: 'Bills', icon: 'receipt_long', color: 'bg-emerald-500' }
-  ];
-
-  const incomeCategories = [
-    { name: 'Salary', icon: 'payments', color: 'bg-emerald-500' },
-    { name: 'Transfer', icon: 'sync_alt', color: 'bg-blue-500' },
-    { name: 'Bonus', icon: 'redeem', color: 'bg-orange-500' },
-    { name: 'Others', icon: 'more_horiz', color: 'bg-gray-500' }
-  ];
+  const handleQuickAddAccount = async () => {
+    if (!newAccountName.trim()) return;
+    const account = await addAccount(newAccountName.trim());
+    if (account) {
+      setAccountId(account.id);
+      setIsAddingAccount(false);
+      setNewAccountName('');
+    }
+  };
 
   useEffect(() => {
     const transaction = transactions.find(t => t.id === id);
     if (transaction) {
       setAmount(transaction.amount.toString());
       setType(transaction.type);
-      setCategory(transaction.category);
-      setMerchant(transaction.title);
+      setCategoryId(transaction.category_id);
+      setAccountId(transaction.account_id);
+      
+      // 处理标题和备注（之前保存时合并了）
+      const parts = transaction.note ? transaction.note.split(': ') : [transaction.title];
+      setMerchant(parts[0]);
+      setNote(parts[1] || '');
       
       const d = new Date(transaction.date);
       setDate(d.toISOString().split('T')[0]);
       setTime(d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
-      setNote(transaction.note || '');
     } else {
       navigate('/transactions');
     }
   }, [id, transactions, navigate]);
 
-  const categories = type === 'expense' ? expenseCategories : incomeCategories;
+  const filteredCategories = allCategories.filter(c => c.type === type);
 
-  const handleUpdate = () => {
-    if (!amount || !merchant) return;
+  const handleUpdate = async () => {
+    if (!amount || !merchant || !accountId || !categoryId) return;
 
-    const selectedCategory = categories.find(c => c.name === category);
-
-    updateTransaction(id, {
-      title: merchant,
+    await updateTransaction(id, {
+      account_id: accountId,
+      category_id: categoryId,
       amount: parseFloat(amount),
-      date: new Date(`${date}T${time}`),
+      date: new Date(`${date}T${time}`).toISOString(),
       type: type,
-      category: category,
-      icon: selectedCategory ? selectedCategory.icon : (type === 'expense' ? 'receipt' : 'add_circle'),
-      note: note
+      note: merchant + (note ? `: ${note}` : '')
     });
 
     navigate('/transactions');
@@ -107,18 +107,64 @@ const EditTransaction = () => {
           </div>
 
           <div className="px-4 py-4">
+            <div className="flex items-center justify-between pb-3">
+              <h3 className="text-[#111318] dark:text-white text-base font-bold leading-tight tracking-[-0.015em]">Account</h3>
+              <button 
+                onClick={() => setIsAddingAccount(!isAddingAccount)}
+                className="text-primary text-xs font-bold flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-sm">{isAddingAccount ? 'close' : 'add'}</span>
+                {isAddingAccount ? 'Cancel' : 'Add Account'}
+              </button>
+            </div>
+
+            {isAddingAccount ? (
+              <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <input
+                  autoFocus
+                  className="flex-1 px-4 py-2 rounded-xl border border-primary/30 dark:border-primary/20 bg-primary/5 dark:bg-primary/10 text-sm outline-none focus:border-primary transition-all"
+                  placeholder="e.g. Cash, Card"
+                  value={newAccountName}
+                  onChange={(e) => setNewAccountName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleQuickAddAccount()}
+                />
+                <button 
+                  onClick={handleQuickAddAccount}
+                  disabled={!newAccountName.trim()}
+                  className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 disabled:opacity-50 transition-all active:scale-95"
+                >
+                  Create
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                {accounts.map((acc) => (
+                  <div 
+                    key={acc.id} 
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all cursor-pointer whitespace-nowrap ${accountId === acc.id ? 'bg-primary text-white border-primary shadow-sm' : 'bg-background-light dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700'}`}
+                    onClick={() => setAccountId(acc.id)}
+                  >
+                    <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
+                    <span className="text-sm font-bold">{acc.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="px-4 py-4">
             <h3 className="text-[#111318] dark:text-white text-base font-bold leading-tight tracking-[-0.015em] pb-3">Category</h3>
             <div className="grid grid-cols-4 gap-3">
-              {categories.map((cat) => (
+              {filteredCategories.map((cat) => (
                 <div 
-                  key={cat.name} 
-                  className={`flex flex-col items-center gap-2 cursor-pointer ${category === cat.name ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
-                  onClick={() => setCategory(cat.name)}
+                  key={cat.id} 
+                  className={`flex flex-col items-center gap-2 cursor-pointer ${categoryId === cat.id ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
+                  onClick={() => setCategoryId(cat.id)}
                 >
-                  <div className={`flex size-14 items-center justify-center rounded-xl transition-all ${category === cat.name ? `${type === 'expense' ? 'bg-primary shadow-primary/20' : 'bg-emerald-500 shadow-emerald-500/20'} text-white shadow-md` : 'bg-background-light dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}>
-                    <span className="material-symbols-outlined">{cat.icon}</span>
+                  <div className={`flex size-14 items-center justify-center rounded-xl transition-all ${categoryId === cat.id ? `${type === 'expense' ? 'bg-primary shadow-primary/20' : 'bg-emerald-500 shadow-emerald-500/20'} text-white shadow-md` : 'bg-background-light dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}>
+                    <span className="material-symbols-outlined">{cat.icon_name || 'receipt'}</span>
                   </div>
-                  <span className={`text-xs font-medium ${category === cat.name ? (type === 'expense' ? 'text-primary font-bold' : 'text-emerald-600 font-bold') : 'text-gray-500'}`}>{cat.name}</span>
+                  <span className={`text-xs font-medium ${categoryId === cat.id ? (type === 'expense' ? 'text-primary font-bold' : 'text-emerald-600 font-bold') : 'text-gray-500'}`}>{cat.name}</span>
                 </div>
               ))}
             </div>

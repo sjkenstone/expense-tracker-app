@@ -44,7 +44,7 @@ const Register = () => {
       if (authError) throw authError;
 
       if (data.user) {
-        // 2. 同步到 profiles 表
+        // Create profile
         const { error: profileError } = await supabase
           .from('profiles')
           .insert([
@@ -55,10 +55,18 @@ const Register = () => {
             }
           ]);
 
-        if (profileError) {
-          console.error('Error creating profile:', profileError);
-          // 虽然 profile 创建失败，但 Auth 已经成功了，这里可以根据需求处理
-        }
+        if (profileError) throw profileError;
+
+        // Create a default account for the new user
+        const { error: accountError } = await supabase
+          .from('accounts')
+          .insert([{ 
+            user_id: data.user.id, 
+            name: 'Cash', 
+            balance: 0 
+          }]);
+
+        if (accountError) console.error('Error creating default account:', accountError);
 
         setSuccess(true);
       }

@@ -1,48 +1,59 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useExpense } from '../context/ExpenseContext';
 
 const AddExpense = () => {
   const navigate = useNavigate();
-  const { addTransaction } = useExpense();
+  const { addTransaction, accounts, categories: allCategories, addAccount } = useExpense();
   
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense');
-  const [category, setCategory] = useState('Food');
+  const [categoryId, setCategoryId] = useState('');
+  const [accountId, setAccountId] = useState('');
   const [merchant, setMerchant] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
   const [note, setNote] = useState('');
+  const [isAddingAccount, setIsAddingAccount] = useState(false);
+  const [newAccountName, setNewAccountName] = useState('');
 
-  const expenseCategories = [
-    { name: 'Food', icon: 'restaurant', color: 'bg-primary', textColor: 'text-white' },
-    { name: 'Transport', icon: 'directions_car', color: 'bg-orange-500', textColor: 'text-white' },
-    { name: 'Shopping', icon: 'shopping_bag', color: 'bg-purple-500', textColor: 'text-white' },
-    { name: 'Bills', icon: 'receipt_long', color: 'bg-emerald-500', textColor: 'text-white' }
-  ];
+  const handleQuickAddAccount = async () => {
+    if (!newAccountName.trim()) return;
+    const account = await addAccount(newAccountName.trim());
+    if (account) {
+      setAccountId(account.id);
+      setIsAddingAccount(false);
+      setNewAccountName('');
+    }
+  };
 
-  const incomeCategories = [
-    { name: 'Salary', icon: 'payments', color: 'bg-emerald-500', textColor: 'text-white' },
-    { name: 'Transfer', icon: 'sync_alt', color: 'bg-blue-500', textColor: 'text-white' },
-    { name: 'Bonus', icon: 'redeem', color: 'bg-orange-500', textColor: 'text-white' },
-    { name: 'Others', icon: 'more_horiz', color: 'bg-gray-500', textColor: 'text-white' }
-  ];
+  // 默认选中第一个账户
+  useEffect(() => {
+    if (accounts.length > 0 && !accountId) {
+      setAccountId(accounts[0].id);
+    }
+  }, [accounts, accountId]);
 
-  const categories = type === 'expense' ? expenseCategories : incomeCategories;
+  // 根据类型过滤分类
+  const filteredCategories = allCategories.filter(c => c.type === type);
 
-  const handleSave = () => {
-    if (!amount || !merchant) return;
+  // 默认选中第一个分类
+  useEffect(() => {
+    if (filteredCategories.length > 0) {
+      setCategoryId(filteredCategories[0].id);
+    }
+  }, [type, allCategories]);
 
-    const selectedCategory = categories.find(c => c.name === category);
+  const handleSave = async () => {
+    if (!amount || !merchant || !accountId || !categoryId) return;
 
-    addTransaction({
-      title: merchant,
+    await addTransaction({
+      account_id: accountId,
+      category_id: categoryId,
       amount: parseFloat(amount),
-      date: new Date(`${date}T${time}`),
+      date: new Date(`${date}T${time}`).toISOString(),
       type: type,
-      category: category,
-      icon: selectedCategory ? selectedCategory.icon : (type === 'expense' ? 'receipt' : 'add_circle'),
-      note: note
+      note: merchant + (note ? `: ${note}` : '')
     });
 
     navigate('/dashboard');
@@ -50,7 +61,6 @@ const AddExpense = () => {
 
   const handleTypeChange = (newType) => {
     setType(newType);
-    setCategory(newType === 'expense' ? 'Food' : 'Salary');
   };
 
   return (
@@ -109,20 +119,81 @@ const AddExpense = () => {
           </div>
 
           <div className="px-4 py-4">
+            <div className="flex items-center justify-between pb-3">
+              <h3 className="text-[#111318] dark:text-white text-base font-bold leading-tight tracking-[-0.015em]">Account</h3>
+              <button 
+                onClick={() => setIsAddingAccount(!isAddingAccount)}
+                className="text-primary text-xs font-bold flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-sm">{isAddingAccount ? 'close' : 'add'}</span>
+                {isAddingAccount ? 'Cancel' : 'Add Account'}
+              </button>
+            </div>
+
+            {isAddingAccount ? (
+              <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                <input
+                  autoFocus
+                  className="flex-1 px-4 py-2 rounded-xl border border-primary/30 dark:border-primary/20 bg-primary/5 dark:bg-primary/10 text-sm outline-none focus:border-primary transition-all"
+                  placeholder="e.g. Cash, Card"
+                  value={newAccountName}
+                  onChange={(e) => setNewAccountName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleQuickAddAccount()}
+                />
+                <button 
+                  onClick={handleQuickAddAccount}
+                  disabled={!newAccountName.trim()}
+                  className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 disabled:opacity-50 transition-all active:scale-95"
+                >
+                  Create
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                {accounts.map((acc) => (
+                  <div 
+                    key={acc.id} 
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all cursor-pointer whitespace-nowrap ${accountId === acc.id ? 'bg-primary text-white border-primary shadow-sm' : 'bg-background-light dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700'}`}
+                    onClick={() => setAccountId(acc.id)}
+                  >
+                    <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
+                    <span className="text-sm font-bold">{acc.name}</span>
+                  </div>
+                ))}
+                {accounts.length === 0 && (
+                  <div className="text-gray-400 text-sm italic py-2 px-1 flex flex-col gap-1">
+                    <p>No accounts found.</p>
+                    <button 
+                      onClick={() => setIsAddingAccount(true)}
+                      className="text-primary font-bold hover:underline inline-flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">add_circle</span>
+                      Click here to add your first account
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="px-4 py-4">
             <h3 className="text-[#111318] dark:text-white text-base font-bold leading-tight tracking-[-0.015em] pb-3">Category</h3>
             <div className="grid grid-cols-4 gap-3">
-              {categories.map((cat) => (
+              {filteredCategories.map((cat) => (
                 <div 
-                  key={cat.name} 
-                  className={`flex flex-col items-center gap-2 cursor-pointer ${category === cat.name ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
-                  onClick={() => setCategory(cat.name)}
+                  key={cat.id} 
+                  className={`flex flex-col items-center gap-2 cursor-pointer ${categoryId === cat.id ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
+                  onClick={() => setCategoryId(cat.id)}
                 >
-                  <div className={`flex size-14 items-center justify-center rounded-xl transition-all ${category === cat.name ? `${type === 'expense' ? 'bg-primary shadow-primary/20' : 'bg-emerald-500 shadow-emerald-500/20'} text-white shadow-md` : 'bg-background-light dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}>
-                    <span className="material-symbols-outlined">{cat.icon}</span>
+                  <div className={`flex size-14 items-center justify-center rounded-xl transition-all ${categoryId === cat.id ? `${type === 'expense' ? 'bg-primary shadow-primary/20' : 'bg-emerald-500 shadow-emerald-500/20'} text-white shadow-md` : 'bg-background-light dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}>
+                    <span className="material-symbols-outlined">{cat.icon_name || 'receipt'}</span>
                   </div>
-                  <span className={`text-xs font-medium ${category === cat.name ? (type === 'expense' ? 'text-primary font-bold' : 'text-emerald-600 font-bold') : 'text-gray-500'}`}>{cat.name}</span>
+                  <span className={`text-xs font-medium ${categoryId === cat.id ? (type === 'expense' ? 'text-primary font-bold' : 'text-emerald-600 font-bold') : 'text-gray-500'}`}>{cat.name}</span>
                 </div>
               ))}
+              {filteredCategories.length === 0 && (
+                <div className="col-span-4 text-center py-4 text-gray-400 text-sm">No categories available.</div>
+              )}
             </div>
           </div>
 
@@ -132,7 +203,7 @@ const AddExpense = () => {
                 {type === 'expense' ? 'Merchant Name' : 'Income Source'}
               </label>
               <div className="relative">
-                <span className={`material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl transition-colors ${category !== '' ? (type === 'expense' ? 'text-primary/60' : 'text-emerald-500/60') : ''}`}>
+                <span className={`material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl transition-colors ${categoryId !== '' ? (type === 'expense' ? 'text-primary/60' : 'text-emerald-500/60') : ''}`}>
                   {type === 'expense' ? 'store' : 'account_balance_wallet'}
                 </span>
                 <input 

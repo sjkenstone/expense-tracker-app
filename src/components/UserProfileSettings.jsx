@@ -4,9 +4,19 @@ import { useExpense } from '../context/ExpenseContext';
 
 const UserProfileSettings = () => {
   const navigate = useNavigate();
-  const { user, updateUser, logout } = useExpense();
+  const { user, updateUser, logout, accounts, addAccount } = useExpense();
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(user.name);
+  const [isAddingAccount, setIsAddingAccount] = useState(false);
+  const [newAccountName, setNewAccountName] = useState('');
+
+  const handleAddAccount = async () => {
+    if (newAccountName.trim()) {
+      await addAccount(newAccountName.trim());
+      setNewAccountName('');
+      setIsAddingAccount(false);
+    }
+  };
 
   const handleNameSave = () => {
     if (newName.trim()) {
@@ -85,7 +95,57 @@ const UserProfileSettings = () => {
 </div>
 
 <div className="px-4">
-<h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold leading-tight tracking-[0.05em] uppercase pb-2 pt-4">Account Settings</h3>
+<div className="flex items-center justify-between pb-2 pt-4">
+  <h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold leading-tight tracking-[0.05em] uppercase">My Accounts</h3>
+  <button 
+    onClick={() => setIsAddingAccount(!isAddingAccount)}
+    className="text-primary text-[10px] font-bold uppercase tracking-widest flex items-center gap-1"
+  >
+    <span className="material-symbols-outlined text-xs">{isAddingAccount ? 'close' : 'add'}</span>
+    {isAddingAccount ? 'Cancel' : 'New Account'}
+  </button>
+</div>
+
+{isAddingAccount && (
+  <div className="mb-4 flex gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+    <input
+      autoFocus
+      className="flex-1 px-4 py-2 rounded-xl border border-primary/30 dark:border-primary/20 bg-primary/5 dark:bg-primary/10 text-sm outline-none focus:border-primary transition-all text-slate-900 dark:text-white"
+      placeholder="Account Name (e.g. Bank)"
+      value={newAccountName}
+      onChange={(e) => setNewAccountName(e.target.value)}
+      onKeyDown={(e) => e.key === 'Enter' && handleAddAccount()}
+    />
+    <button 
+      onClick={handleAddAccount}
+      className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20"
+    >
+      Add
+    </button>
+  </div>
+)}
+
+<div className="space-y-1 mb-6">
+  {accounts.map(acc => (
+    <div key={acc.id} className="flex items-center gap-4 bg-white dark:bg-slate-900/50 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+      <div className="text-emerald-500 flex items-center justify-center rounded-lg bg-emerald-500/10 shrink-0 size-10">
+        <span className="material-symbols-outlined text-xl">account_balance_wallet</span>
+      </div>
+      <div className="flex-1">
+        <p className="text-slate-900 dark:text-white text-base font-medium leading-none mb-1">{acc.name}</p>
+        <p className="text-slate-500 text-xs font-mono tracking-tight">${(acc.balance / 100).toFixed(2)}</p>
+      </div>
+      <span className="material-symbols-outlined text-slate-300">more_vert</span>
+    </div>
+  ))}
+  {accounts.length === 0 && (
+    <div className="text-center py-6 bg-slate-50/50 dark:bg-slate-800/20 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+      <p className="text-slate-400 text-sm italic">No accounts yet. Add one to start tracking!</p>
+    </div>
+  )}
+</div>
+
+<h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold leading-tight tracking-[0.05em] uppercase pb-2">Account Settings</h3>
 <div className="space-y-1">
 <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
 <div className="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-10">
