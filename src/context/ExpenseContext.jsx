@@ -218,6 +218,26 @@ export const ExpenseProvider = ({ children }) => {
     return null;
   };
 
+  const addCategory = async (name, type, icon = 'label') => {
+    if (!session?.user || !name.trim()) return null;
+
+    const { data, error } = await supabase
+      .from('categories')
+      .insert([{ 
+        user_id: session.user.id, 
+        name, 
+        type, 
+        icon_name: icon 
+      }])
+      .select();
+
+    if (!error && data) {
+      setCategories(prev => [...prev, data[0]]);
+      return data[0];
+    }
+    return null;
+  };
+
   const updateUser = async (userData) => {
     if (!session?.user) return;
 
@@ -268,6 +288,7 @@ export const ExpenseProvider = ({ children }) => {
       updateTransaction,
       deleteTransaction,
       addAccount,
+      addCategory,
       updateUser,
       logout,
       balance: calculateBalance(),

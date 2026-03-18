@@ -4,7 +4,7 @@ import { useExpense } from '../context/ExpenseContext';
 
 const AddExpense = () => {
   const navigate = useNavigate();
-  const { addTransaction, accounts, categories: allCategories, addAccount } = useExpense();
+  const { addTransaction, accounts, categories: allCategories, addAccount, addCategory } = useExpense();
   
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense');
@@ -16,6 +16,18 @@ const AddExpense = () => {
   const [note, setNote] = useState('');
   const [isAddingAccount, setIsAddingAccount] = useState(false);
   const [newAccountName, setNewAccountName] = useState('');
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+
+  const handleQuickAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    const category = await addCategory(newCategoryName.trim(), type);
+    if (category) {
+      setCategoryId(category.id);
+      setIsAddingCategory(false);
+      setNewCategoryName('');
+    }
+  };
 
   const handleQuickAddAccount = async () => {
     if (!newAccountName.trim()) return;
@@ -177,7 +189,37 @@ const AddExpense = () => {
           </div>
 
           <div className="px-4 py-4">
-            <h3 className="text-[#111318] dark:text-white text-base font-bold leading-tight tracking-[-0.015em] pb-3">Category</h3>
+            <div className="flex items-center justify-between pb-3">
+              <h3 className="text-[#111318] dark:text-white text-base font-bold leading-tight tracking-[-0.015em]">Category</h3>
+              <button 
+                onClick={() => setIsAddingCategory(!isAddingCategory)}
+                className="text-primary text-xs font-bold flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-sm">{isAddingCategory ? 'close' : 'add'}</span>
+                {isAddingCategory ? 'Cancel' : 'Add Category'}
+              </button>
+            </div>
+
+            {isAddingCategory ? (
+              <div className="flex gap-2 animate-in fade-in slide-in-from-top-2 duration-300 mb-2">
+                <input
+                  autoFocus
+                  className="flex-1 px-4 py-2 rounded-xl border border-primary/30 dark:border-primary/20 bg-primary/5 dark:bg-primary/10 text-sm outline-none focus:border-primary transition-all"
+                  placeholder="e.g. Entertainment, Health"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleQuickAddCategory()}
+                />
+                <button 
+                  onClick={handleQuickAddCategory}
+                  disabled={!newCategoryName.trim()}
+                  className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 disabled:opacity-50 transition-all active:scale-95"
+                >
+                  Create
+                </button>
+              </div>
+            ) : null}
+
             <div className="grid grid-cols-4 gap-3">
               {filteredCategories.map((cat) => (
                 <div 
@@ -188,10 +230,10 @@ const AddExpense = () => {
                   <div className={`flex size-14 items-center justify-center rounded-xl transition-all ${categoryId === cat.id ? `${type === 'expense' ? 'bg-primary shadow-primary/20' : 'bg-emerald-500 shadow-emerald-500/20'} text-white shadow-md` : 'bg-background-light dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700'}`}>
                     <span className="material-symbols-outlined">{cat.icon_name || 'receipt'}</span>
                   </div>
-                  <span className={`text-xs font-medium ${categoryId === cat.id ? (type === 'expense' ? 'text-primary font-bold' : 'text-emerald-600 font-bold') : 'text-gray-500'}`}>{cat.name}</span>
+                  <span className={`text-xs font-medium text-center leading-tight ${categoryId === cat.id ? (type === 'expense' ? 'text-primary font-bold' : 'text-emerald-600 font-bold') : 'text-gray-500'}`}>{cat.name}</span>
                 </div>
               ))}
-              {filteredCategories.length === 0 && (
+              {filteredCategories.length === 0 && !isAddingCategory && (
                 <div className="col-span-4 text-center py-4 text-gray-400 text-sm">No categories available.</div>
               )}
             </div>

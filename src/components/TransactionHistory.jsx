@@ -4,12 +4,13 @@ import { useExpense } from '../context/ExpenseContext';
 
 const TransactionHistory = () => {
   const navigate = useNavigate();
-  const { transactions } = useExpense();
+  const { transactions, categories } = useExpense();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
 
-  const filters = ['All', 'Food', 'Transport', 'Shopping', 'Housing', 'Salary'];
-
+  const filters = ['All', ...categories.map(c => c.name)];
+  // const filters = ['All', 'Food', 'Transport', 'Shopping', 'Housing', 'Salary', 'Transfer'];
+  
   const filteredTransactions = transactions.filter(t => {
     const matchesSearch = t.title.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = selectedFilter === 'All' || t.category === selectedFilter;
@@ -85,7 +86,7 @@ const TransactionHistory = () => {
                 onClick={() => setSelectedFilter(filter)}
                 className={`flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-5 shadow-sm transition-colors ${selectedFilter === filter ? 'bg-primary text-white shadow-primary/20' : 'bg-primary/10 dark:bg-white/5 border border-primary/10 text-[#111318] dark:text-white'}`}
               >
-                <p className="text-sm font-semibold">{filter}</p>
+                <p className="text-sm font-semibold">{filter}</p>  
               </button>
             ))}
           </div>
